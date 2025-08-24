@@ -34,6 +34,15 @@ public class PeachApiClientTests(ITestOutputHelper output)
         ),
         offers => Assert.All(offers, o => Assert.Equal(OfferType.Bid, o.Type)));
 
+    [Fact]
+    public async Task Search_all_offers_with_only_mandatory_filters() => await Seach_offers_and_assert(new OfferFilter(
+        Type: OfferTypeFilter.All,
+        Amount: [100_000, 1_000_000],
+        MeansOfPayment: null,
+        MaxPremium: null,
+        MinReputation: null
+    ));
+
     private async Task Seach_offers_and_assert(OfferFilter filter, Action<List<Offer>>? assertOnList = null)
     {
         PeachApiClient client = Factory.CreatePeachClient();

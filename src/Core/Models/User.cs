@@ -7,17 +7,17 @@ public record Disputes(
 );
 
 public sealed record User(
-    string Id
-    //DateTime CreationDate,
-    //int Trades,
-    //double Rating,
-    //double HistoryRating,
-    //int RatingCount,
-    //double PeachRating,
-    //double UserRating,
-    //double RecentRating,
-    //List<string> Medals,
-    //Disputes Disputes,
-    //string PgpPublicKey,
-    //string PgpPublicKeyProof
+    string Id,
+    DateTime CreationDate,
+    int Trades,
+    double Rating,
+    double HistoryRating,
+    int RatingCount,
+    double PeachRating,
+    double UserRating,
+    double RecentRating,
+    List<string> Medals,
+    Disputes Disputes,
+    string PgpPublicKey,
+    string PgpPublicKeyProof
 );

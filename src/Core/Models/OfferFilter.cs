@@ -13,7 +13,7 @@ public enum OfferTypeFilter
 public record class OfferFilter(
     [property: JsonConverter(typeof(OfferTypeFilterConverter))] OfferTypeFilter Type,
     List<decimal> Amount,
-    Dictionary<string, List<string>> MeansOfPayment,
-    decimal MaxPremium,
-    double MinReputation
+    Dictionary<string, List<string>>? MeansOfPayment,
+    decimal? MaxPremium,
+    double? MinReputation
 );
