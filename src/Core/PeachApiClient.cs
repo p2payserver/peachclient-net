@@ -1,11 +1,12 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System.Text.Json;
+using System.Text.Json.Serialization;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using PeachClient.Models;
 using RestSharp;
 using RestSharp.Serializers.Json;
 using SharpX;
 using SharpX.Extensions;
-using System.Text.Json;
 using static SharpX.Guard;
 
 namespace PeachClient;
@@ -30,7 +31,11 @@ public sealed class PeachApiClient
         new JsonSerializerOptions
         {
             PropertyNameCaseInsensitive = true,
-            PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase,
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            //Converters =
+            //{
+            //    new JsonStringEnumConverter(JsonNamingPolicy.CamelCase, allowIntegerValues: false)
+            //}
         }));
     }
 

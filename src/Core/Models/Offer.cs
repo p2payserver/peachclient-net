@@ -1,10 +1,20 @@
-﻿namespace PeachClient.Models;
+﻿using System;
+using System.Text.Json.Serialization;
+using PeachClient.Serialization;
+
+namespace PeachClient.Models;
+
+public enum OfferType
+{
+    Ask = 0,
+    Bid
+}
 
 public record Offer(
     string Id,
-    string Type,
+    [property: JsonConverter(typeof(JsonStringEnumConverter))]  OfferType Type,
     //User User,
-    decimal[] Amount,
+    [property: JsonConverter(typeof(DecimalArrayFlexibleConverter))] decimal[] Amount,
     //Dictionary<string, List<string>> MeansOfPayment,
     bool Online,
     DateTime? PublishingDate,
