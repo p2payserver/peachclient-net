@@ -1,14 +1,26 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
+    <PackageId>PeachClient</PackageId>
     <AssemblyName>PeachClient</AssemblyName>
-    <Version>0.1.0</Version>
-    <Title>PeachClient Core</Title>
+    <OutputType>Library</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <LangVersion>13.0</LangVersion>
+    <Title>Peach Bitcoin API Client Library</Title>
+    <Description>Unofficial client library for the Peach Bitcoin API</Description>
+    <Version>0.1.0-preview</Version>
     <Authors>0x4C6F6B69</Authors>
+    <Copyright>Copyright (C) 0x4C6F6B69, 2025</Copyright>
+    <PackageProjectUrl>https://github.com/0x4C6F6B69/peachclient-net</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/0x4C6F6B69/peachclient-net</RepositoryUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageTags>peach;bitcoin;client;api;library</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
     <RootNamespace>PeachClient</RootNamespace>
+    <Packable>true</Packable>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
   <ItemGroup>
