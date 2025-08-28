@@ -37,7 +37,7 @@ public class PeachApiClientTests(ITestOutputHelper output)
     [Fact]
     public async Task Search_all_offers_with_only_mandatory_filters() => await Seach_offers_and_assert(new OfferFilter(
         Type: OfferTypeFilter.All,
-        Amount: [100_000, 1_000_000],
+        Amount: null,
         MeansOfPayment: null,
         MaxPremium: null,
         MinReputation: null
