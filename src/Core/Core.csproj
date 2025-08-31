@@ -8,7 +8,7 @@
     <LangVersion>13.0</LangVersion>
     <Title>Peach Bitcoin API Client Library</Title>
     <Description>Unofficial client library for the Peach Bitcoin API</Description>
-    <Version>0.1.2-preview</Version>
+    <Version>0.1.3-preview</Version>
     <Authors>0x4C6F6B69</Authors>
     <Copyright>Copyright (C) 0x4C6F6B69, 2025</Copyright>
     <PackageProjectUrl>https://github.com/0x4C6F6B69/peachclient-net</PackageProjectUrl>
