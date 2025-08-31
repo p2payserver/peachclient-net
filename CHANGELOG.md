@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 - Perfected `Offer` type.
+- Implemented `DelayAttribute` to not stress Peach server.
 
 ## [0.1.2-previe] - 2025-08-31
 
