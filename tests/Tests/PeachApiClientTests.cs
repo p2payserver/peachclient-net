@@ -6,7 +6,7 @@ using Xunit.Abstractions;
 public class PeachApiClientTests(ITestOutputHelper output)
 {
     [Fact]
-    public async Task Search_all_offer_types() => await Seach_offers_and_assert(new OfferFilter {
+    public async Task Search_all_offer_types() => await SeachOffersAndAssertAsync(new OfferFilter {
         Type = OfferTypeFilter.All,
         Amount = [100_000, 1_000_000],
         MeansOfPayment = new() { ["EUR"] = ["sepa"] },
@@ -15,45 +15,69 @@ public class PeachApiClientTests(ITestOutputHelper output)
     });
 
     [Fact]
-    public async Task Search_ask_offer_types() => await Seach_offers_and_assert(new OfferFilter {
+    public async Task Search_ask_offer_types() => await SeachOffersAndAssertAsync(new OfferFilter {
         Type = OfferTypeFilter.Ask,
         Amount = [100_000, 1_000_000],
         MeansOfPayment = new() { ["EUR"] = ["sepa"] },
         MaxPremium = 12,
         MinReputation = 0.5
-        },
-        offers => Assert.All(offers, o => Assert.Equal(OfferType.Ask, o.Type)));
+    },
+    assert: offers => Assert.All(offers, o => Assert.Equal(OfferType.Ask, o.Type)));
 
     [Fact]
-    public async Task Search_bid_offer_types() => await Seach_offers_and_assert(new OfferFilter {
+    public async Task Search_bid_offer_types() => await SeachOffersAndAssertAsync(new OfferFilter {
         Type = OfferTypeFilter.Bid,
         Amount = [100_000, 1_000_000],
         MeansOfPayment = new() { ["EUR"] = ["sepa"] },
         MaxPremium = 12,
         MinReputation = 0.5
-        },
-        offers => Assert.All(offers, o => Assert.Equal(OfferType.Bid, o.Type)));
+    },
+    assert: offers => Assert.All(offers, o => Assert.Equal(OfferType.Bid, o.Type)));
 
     [Fact]
-    public async Task Search_all_offers_with_only_mandatory_filters() => await Seach_offers_and_assert(new OfferFilter {
+    public async Task Search_offers_with_only_mandatory_filters() => await SeachOffersAndAssertAsync(new OfferFilter {
         Type = OfferTypeFilter.All
     });
 
-    private async Task Seach_offers_and_assert(OfferFilter filter, Action<List<Offer>>? assertOnList = null)
+    [Fact]
+    public async Task Search_offers_with_pagination() => await SeachOffersAndAssertAsync(new OfferFilter {
+        Type = OfferTypeFilter.All,
+    },
+    pagination: new OfferPagination(0, 1),
+    assert: offers => Assert.Single(offers),
+    failOnEmpty: true);
+
+    //[Fact]
+    //public async Task Search_offers_with_sort() => await SeachOffersAndAssertAsync(new OfferFilter {
+    //    Type = OfferTypeFilter.Ask, },
+    //    pagination: new OfferPagination(0, 2),
+    //    sort: OfferSortBy.LowestPremium,
+    //    assert: offers =>
+    //    {
+    //        Assert.Equal(2, offers.Count);
+    //        Assert.True(offers.ElementAt(0).Premium < offers.ElementAt(1).Premium);
+    //    },
+    //    failOnEmpty: true);
+    
+
+    private async Task SeachOffersAndAssertAsync(OfferFilter filter, OfferPagination? pagination = null,
+        //OfferSortBy? sort = null,
+        Action<List<Offer>>? assert = null, bool failOnEmpty = false)
     {
         PeachApiClient client = Factory.CreatePeachClient();
 
-        var result = await client.SearchOffersAsync(filter);
+        var result = await client.SearchOffersAsync(filter, pagination: pagination); //, sort: sort);
 
         Assert.Equal(MaybeType.Just, result.Tag);
         var response = result.FromJust();
         if (response!.Total > 0) {
             Assert.NotEmpty(response.Offers);
-            assertOnList?.Invoke(response.Offers);
+            assert?.Invoke(response.Offers);
             output.WriteLine(ObjectDumper.Dump(response.Offers));
         }
         else {
-            output.WriteLine("No offers found");
+            if (failOnEmpty) { Assert.Fail("No offers found"); }
+            else { output.WriteLine("No offers found"); }
         }
     }
 }
