@@ -32,10 +32,7 @@ public sealed class PeachApiClient
         {
             PropertyNameCaseInsensitive = true,
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            //Converters =
-            //{
-            //    new JsonStringEnumConverter(JsonNamingPolicy.CamelCase, allowIntegerValues: false)
-            //}
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
         }));
     }
 
@@ -73,7 +70,7 @@ public sealed class PeachApiClient
     }
 
     public async Task<Maybe<OfferResponse>> SearchOffersAsync(OfferFilter filter,
-        OfferPagination? pagination = null) //, OfferSortBy? sort = null)
+        OfferPagination? pagination = null, OfferSortBy? sort = null)
     {
         DisallowNull(nameof(filter), filter);
 
@@ -84,9 +81,9 @@ public sealed class PeachApiClient
                 request.AddQueryParameter("page", pagination.PageNumber.ToString(), encode: false);
                 request.AddQueryParameter("size", pagination.PageSize.ToString(), encode: false);
             }
-            //if (sort != null) {
-            //    request.AddQueryParameter("sortBy", sort.ToString().ToLowerFirst());
-            //}
+            if (sort != null) {
+               request.AddQueryParameter("sortBy", sort.ToString().ToLowerFirst());
+            }
             request.AddJsonBody(filter);
 
             response = await _client.ExecuteAsync(request);

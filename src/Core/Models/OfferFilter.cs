@@ -22,10 +22,10 @@ public record class OfferFilter
 
 public record class OfferPagination(int PageNumber, int PageSize);
 
-//public enum OfferSortBy
-//{
-//    BestReputation,
-//    HighestAmount,
-//    HighestPrice,
-//    LowestPremium
-//}
+public enum OfferSortBy
+{
+   BestReputation,
+   HighestAmount,
+   HighestPrice,
+   LowestPremium
+}
