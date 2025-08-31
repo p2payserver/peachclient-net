@@ -17,9 +17,9 @@ public record Offer(
     Dictionary<string, List<string>> MeansOfPayment,
     bool Online,
     DateTime? PublishingDate,
-    decimal Premium,
+    decimal? Premium,
     Dictionary<string, decimal> Prices,
-    string Escrow
+    string? Escrow
 );
 
 public sealed record OfferResponse(
