@@ -72,13 +72,21 @@ public sealed class PeachApiClient
         return price!.ToMaybe();
     }
 
-    public async Task<Maybe<OfferResponse>> SearchOffersAsync(OfferFilter filter)
+    public async Task<Maybe<OfferResponse>> SearchOffersAsync(OfferFilter filter,
+        OfferPagination? pagination = null) //, OfferSortBy? sort = null)
     {
         DisallowNull(nameof(filter), filter);
 
         RestResponse response;
         try {
             var request = new RestRequest("offer/search", Method.Post);
+            if (pagination != null) {
+                request.AddQueryParameter("page", pagination.PageNumber.ToString(), encode: false);
+                request.AddQueryParameter("size", pagination.PageSize.ToString(), encode: false);
+            }
+            //if (sort != null) {
+            //    request.AddQueryParameter("sortBy", sort.ToString().ToLowerFirst());
+            //}
             request.AddJsonBody(filter);
 
             response = await _client.ExecuteAsync(request);

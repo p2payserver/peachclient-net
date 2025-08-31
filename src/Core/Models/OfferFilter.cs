@@ -19,3 +19,13 @@ public record class OfferFilter
     public decimal? MaxPremium { get; set; }
     public double? MinReputation { get; set; }
 }
+
+public record class OfferPagination(int PageNumber, int PageSize);
+
+//public enum OfferSortBy
+//{
+//    BestReputation,
+//    HighestAmount,
+//    HighestPrice,
+//    LowestPremium
+//}
