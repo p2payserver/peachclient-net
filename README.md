@@ -13,7 +13,7 @@ Based on their official [API documentation](https://docs.peachbitcoin.com/#intro
 ## Install via NuGet
 
 ```
-dotnet add package PeachClient --version 0.1.1-preview
+dotnet add package PeachClient --version 0.1.2-preview
 ```
 
 ## Quick Start
@@ -37,7 +37,7 @@ var result = await client.SearchOffersAsync(new OfferFilter {
         MeansOfPayment = new() { ["EUR"] = ["revolut"] },
         MaxPremium = 12,
         MinReputation = 0.5
-    });
+    }, new OfferPagination(0, 10), OfferSortBy.LowestPremium);
 if (result.MatchJust(out var response) && !response.Offers.IsEmpty()) {
     foreach (var offer in response.Offers) {
         logger.LogInformation("{Offer}", ObjectDumper.Dump(offer));
