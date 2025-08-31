@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 - Implemented pagination in `SearchOffersAsync` method.
+- Implemented sort in `SearchOffersAsync` method.
 
 ## [0.1.1-preview] - 2025-08-29
 

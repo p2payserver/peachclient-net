@@ -47,26 +47,26 @@ public class PeachApiClientTests(ITestOutputHelper output)
     assert: offers => Assert.Single(offers),
     failOnEmpty: true);
 
-    //[Fact]
-    //public async Task Search_offers_with_sort() => await SeachOffersAndAssertAsync(new OfferFilter {
-    //    Type = OfferTypeFilter.Ask, },
-    //    pagination: new OfferPagination(0, 2),
-    //    sort: OfferSortBy.LowestPremium,
-    //    assert: offers =>
-    //    {
-    //        Assert.Equal(2, offers.Count);
-    //        Assert.True(offers.ElementAt(0).Premium < offers.ElementAt(1).Premium);
-    //    },
-    //    failOnEmpty: true);
+    [Fact]
+    public async Task Search_offers_with_sort() => await SeachOffersAndAssertAsync(new OfferFilter {
+       Type = OfferTypeFilter.Ask, },
+       pagination: new OfferPagination(0, 2),
+       sort: OfferSortBy.LowestPremium,
+       assert: offers =>
+       {
+           Assert.Equal(2, offers.Count);
+           Assert.True(offers.ElementAt(0).Premium < offers.ElementAt(1).Premium);
+       },
+       failOnEmpty: true);
     
 
     private async Task SeachOffersAndAssertAsync(OfferFilter filter, OfferPagination? pagination = null,
-        //OfferSortBy? sort = null,
+        OfferSortBy? sort = null,
         Action<List<Offer>>? assert = null, bool failOnEmpty = false)
     {
         PeachApiClient client = Factory.CreatePeachClient();
 
-        var result = await client.SearchOffersAsync(filter, pagination: pagination); //, sort: sort);
+        var result = await client.SearchOffersAsync(filter, pagination: pagination, sort: sort);
 
         Assert.Equal(MaybeType.Just, result.Tag);
         var response = result.FromJust();
