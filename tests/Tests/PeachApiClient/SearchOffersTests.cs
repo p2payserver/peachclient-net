@@ -61,14 +61,14 @@ public class SearchOffersTests(ITestOutputHelper output)
     {
         Type = OfferTypeFilter.Ask,
     },
-       pagination: new OfferPagination(0, 2),
-       sort: OfferSortBy.LowestPremium,
-       assert: offers =>
-       {
-           Assert.Equal(2, offers.Count);
-           Assert.True(offers.ElementAt(0).Premium < offers.ElementAt(1).Premium);
-       },
-       failOnEmpty: true);
+    pagination: new OfferPagination(0, 2),
+    sort: OfferSortBy.HighestAmount,
+    assert: offers =>
+    {
+        Assert.Equal(2, offers.Count);
+        Assert.True(offers.ElementAt(0).Amount[0] > offers.ElementAt(1).Amount[0]);
+    },
+    failOnEmpty: true);
 
     private async Task SeachOffersAndAssertAsync(OfferFilter filter, OfferPagination? pagination = null,
         OfferSortBy? sort = null,
