@@ -82,7 +82,7 @@ public sealed class PeachApiClient
                 request.AddQueryParameter("size", pagination.PageSize.ToString(), encode: false);
             }
             if (sort != null) {
-               request.AddQueryParameter("sortBy", sort.ToString().ToLowerFirst());
+                request.AddQueryParameter("sortBy", sort.ToString().ToLowerFirst());
             }
             request.AddJsonBody(filter);
 
@@ -127,15 +127,33 @@ public sealed class PeachApiClient
             }
         }
         else {
-           return BadSchema("offers");
+            return BadSchema("offers");
         }
 
         return new OfferResponse(offers, total, remaining).ToJust();
 
         Maybe<OfferResponse> BadSchema(string property)
         {
-            _logger.LogCritical($"Unexpected response schema for offer search.\nCannot find '{property}' property<");
+            _logger.LogCritical($"Unexpected response schema for offer search.\nCannot find '{property}' property");
             return Maybe.Nothing<OfferResponse>();
         }
+    }
+
+    public async Task<Maybe<Offer>> GetOfferAsync(string id)
+    {
+        DisallowNull(nameof(id), id);
+        if (id.IsNumber()) throw new ArgumentException($"Invalid {nameof(id)} parameter format.", nameof(id));
+
+        RestRequest request = new($"offer&/{id}", Method.Get);
+        Offer? offer = null;
+        try {
+            var response = await _client.ExecuteAsync<Offer>(request);
+            offer = response?.Data;
+        }
+        catch (Exception ex) {
+            _logger.LogCritical(ex, "Failed to retrieve market price");
+        }
+
+        return offer.ToMaybe();
     }
 }
