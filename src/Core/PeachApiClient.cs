@@ -42,6 +42,9 @@ public sealed class PeachApiClient
         SystemStatus? status = null;
         try {
             var response = await _client.ExecuteAsync<SystemStatus>(request);
+            if (!ValidateResponse(nameof(GetOfferAsync), response)) {
+                return Maybe.Nothing<SystemStatus>();
+            }
             status = response?.Data;
         }
         catch (Exception ex) {
@@ -60,6 +63,9 @@ public sealed class PeachApiClient
         AveragePrice? price = null;
         try {
             var response = await _client.ExecuteAsync<AveragePrice>(request);
+            if (!ValidateResponse(nameof(GetOfferAsync), response)) {
+                return Maybe.Nothing<AveragePrice>();
+            }
             price = response?.Data;
         }
         catch (Exception ex) {
@@ -87,6 +93,9 @@ public sealed class PeachApiClient
             request.AddJsonBody(filter);
 
             response = await _client.ExecuteAsync(request);
+            if (!ValidateResponse(nameof(GetOfferAsync), response)) {
+                return Maybe.Nothing<OfferResponse>();
+            }
         }
         catch (Exception ex) {
             _logger.LogCritical(ex, "Failed to search offers");
@@ -148,6 +157,9 @@ public sealed class PeachApiClient
         Offer? offer = null;
         try {
             var response = await _client.ExecuteAsync<Offer>(request);
+            if (!ValidateResponse(nameof(GetOfferAsync), response)) {
+                return Maybe.Nothing<Offer>();
+            }
             offer = response?.Data;
         }
         catch (Exception ex) {
@@ -155,5 +167,18 @@ public sealed class PeachApiClient
         }
 
         return offer.ToMaybe();
+    }
+
+    bool ValidateResponse(string method, RestResponse response)
+    {
+        if (response == null) {
+            _logger.LogCritical("{Method} received a NULL response", method);
+            return false;
+        }
+
+        if (!response.IsSuccessful) {
+            _logger.LogError("{Method} REST call failed with code {Code}", method, (int)response.StatusCode);
+        }
+        return response.IsSuccessful;
     }
 }
