@@ -144,7 +144,7 @@ public sealed class PeachApiClient
         DisallowNull(nameof(id), id);
         if (id.IsNumber()) throw new ArgumentException($"Invalid {nameof(id)} parameter format.", nameof(id));
 
-        RestRequest request = new($"offer&/{id}", Method.Get);
+        RestRequest request = new($"offer/{id}", Method.Get);
         Offer? offer = null;
         try {
             var response = await _client.ExecuteAsync<Offer>(request);
