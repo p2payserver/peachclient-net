@@ -70,13 +70,28 @@ public class SearchOffersTests(ITestOutputHelper output)
     },
     failOnEmpty: true);
 
+    [Fact, Delay(DEFAULT_DELAY_MS)]
+    public async Task Get_offers_without_pgp_fields() => await SeachOffersAndAssertAsync(new OfferFilter
+    {
+        Type = OfferTypeFilter.Ask,
+    },
+    pagination: new OfferPagination(0, 5),
+    sort: OfferSortBy.HighestAmount,
+    skipPgpFields: true,
+    assert: offers =>
+        Assert.All(offers, o => {
+            Assert.Null(o.User.PgpPublicKey);
+            Assert.Null(o.User.PgpPublicKeyProof);
+        }),
+    failOnEmpty: true);
+
     private async Task SeachOffersAndAssertAsync(OfferFilter filter, OfferPagination? pagination = null,
         OfferSortBy? sort = null,
-        Action<List<Offer>>? assert = null, bool failOnEmpty = false)
+        Action<List<Offer>>? assert = null, bool failOnEmpty = false, bool skipPgpFields = false)
     {
         PeachApiClient client = Factory.CreatePeachClient();
 
-        var result = await client.SearchOffersAsync(filter, pagination: pagination, sort: sort);
+        var result = await client.SearchOffersAsync(filter, pagination, sort, skipPgpFields);
 
         Assert.Equal(MaybeType.Just, result.Tag);
         var response = result.FromJust();

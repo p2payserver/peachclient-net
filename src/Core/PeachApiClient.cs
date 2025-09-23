@@ -16,6 +16,7 @@ public sealed class PeachApiClient
     private readonly ILogger _logger;
     private readonly PeachApiClientSettings _settings;
     private readonly RestClient _client;
+    private readonly JsonSerializerOptions _offerSerializerOptions;
 
     public PeachApiClient(ILogger<PeachApiClient> logger,
         IOptions<PeachApiClientSettings> options)
@@ -34,6 +35,12 @@ public sealed class PeachApiClient
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
         }));
+
+        _offerSerializerOptions = new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true,
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        };
     }
 
     public async Task<Maybe<SystemStatus>> GetSystemStatusAsync()
@@ -76,9 +83,13 @@ public sealed class PeachApiClient
     }
 
     public async Task<Maybe<OfferResponse>> SearchOffersAsync(OfferFilter filter,
-        OfferPagination? pagination = null, OfferSortBy? sort = null)
+        OfferPagination? pagination = null, OfferSortBy? sort = null, bool skipPgpFields = false)
     {
         DisallowNull(nameof(filter), filter);
+
+        if (skipPgpFields) {
+            _offerSerializerOptions.Converters.Add(new UserSkipPgpFieldsConverter());
+        }
 
         RestResponse response;
         try {
@@ -126,11 +137,7 @@ public sealed class PeachApiClient
 
         if (jsonDoc.RootElement.TryGetProperty("offers", out var offersElement)) {
             foreach (var offerElement in offersElement.EnumerateArray()) {
-                var offer = offerElement.Deserialize<Offer>(new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true,
-                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                });
+                var offer = offerElement.Deserialize<Offer>(_offerSerializerOptions);
 
                 offers.Add(offer);
             }
