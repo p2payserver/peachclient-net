@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 - Implemented `Get_BTC_unit_price_in_EUR` test.
+- Implemented way to limit `User` object size.
 
 ## [0.1.4-preview] - 2025-09-06
 
