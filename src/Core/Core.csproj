@@ -29,12 +29,16 @@
     <PackageReference Include="RestSharp" Version="112.1.0" />
     <PackageReference Include="SharpX" Version="8.3.6" />
   </ItemGroup>
-  
+
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <OutputPath>../../artifacts/PeachClient/Debug</OutputPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <OutputPath>../../artifacts/PeachClient/Release</OutputPath>
   </PropertyGroup>
-  
+
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="" />
+  </ItemGroup>
+
 </Project>
