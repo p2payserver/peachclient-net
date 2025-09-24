@@ -91,10 +91,9 @@ public class SearchOffersTests(ITestOutputHelper output)
     {
         PeachApiClient client = Factory.CreatePeachClient();
 
-        var result = await client.SearchOffersAsync(filter, pagination, sort, skipPgpFields);
+        var response = await client.SearchOffersAsync(filter, pagination, sort, skipPgpFields);
 
-        Assert.Equal(MaybeType.Just, result.Tag);
-        var response = result.FromJust();
+        Assert.NotNull(response);
         if (response!.Total > 0) {
             Assert.NotEmpty(response.Offers);
             assert?.Invoke(response.Offers);

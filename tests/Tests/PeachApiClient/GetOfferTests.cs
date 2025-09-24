@@ -40,7 +40,7 @@ public class GetOfferTests(ITestOutputHelper output)
 
     private async Task<string> PickOfferIdAsync(PeachApiClient client, OfferTypeFilter type)
     {
-        var result = await client.SearchOffersAsync(new OfferFilter
+        var response = await client.SearchOffersAsync(new OfferFilter
         {
             Type = type,
             Amount = [100_000, 1_000_000],
@@ -49,7 +49,7 @@ public class GetOfferTests(ITestOutputHelper output)
             MinReputation = 0.5
         });
 
-        if (!result.MatchJust(out var response) || response!.Total == 0) {
+        if (response == null || response.Total == 0) {
             Assert.Fail($"Unable to get any offer of type {type}");
         }
 

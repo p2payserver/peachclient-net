@@ -82,7 +82,7 @@ public sealed class PeachApiClient
         return price!.ToMaybe();
     }
 
-    public async Task<Maybe<OfferResponse>> SearchOffersAsync(OfferFilter filter,
+    public async Task<OfferResponse?> SearchOffersAsync(OfferFilter filter,
         OfferPagination? pagination = null, OfferSortBy? sort = null, bool skipPgpFields = false)
     {
         DisallowNull(nameof(filter), filter);
@@ -105,16 +105,16 @@ public sealed class PeachApiClient
 
             response = await _client.ExecuteAsync(request);
             if (!ValidateResponse(nameof(GetOfferAsync), response)) {
-                return Maybe.Nothing<OfferResponse>();
+                return null;
             }
         }
         catch (Exception ex) {
             _logger.LogCritical(ex, "Failed to search offers");
-            return Maybe.Nothing<OfferResponse>();
+            return null;
         }
 
         if (!response.IsSuccessful || response.Content.IsEmpty()) {
-            return Maybe.Nothing<OfferResponse>();
+            return null;
         }
 
         // NOTE: in case of a BID offer the JSON respose is so massive that will cause serialization to fail
@@ -146,13 +146,10 @@ public sealed class PeachApiClient
             return BadSchema("offers");
         }
 
-        return new OfferResponse(offers, total, remaining).ToJust();
+        return new OfferResponse(offers, total, remaining);
 
-        Maybe<OfferResponse> BadSchema(string property)
-        {
-            _logger.LogCritical($"Unexpected response schema for offer search.\nCannot find '{property}' property");
-            return Maybe.Nothing<OfferResponse>();
-        }
+        OfferResponse? BadSchema(string property) => _logger.PanicWith<OfferResponse?>(
+            $"Unexpected response schema for offer search.\nCannot find '{property}' property", null);
     }
 
     public async Task<Maybe<Offer>> GetOfferAsync(string id)
