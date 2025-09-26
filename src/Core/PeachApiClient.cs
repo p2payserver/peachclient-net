@@ -47,9 +47,10 @@ public sealed class PeachApiClient
     {
         RestRequest request = new("system/status", Method.Get);
         SystemStatus? status = null;
+
         try {
             var response = await _client.ExecuteAsync<SystemStatus>(request);
-            if (!ValidateResponse(nameof(GetOfferAsync), response)) {
+            if (!IsSuccessfulResponse(nameof(GetOfferAsync), response)) {
                 return Maybe.Nothing<SystemStatus>();
             }
             status = response?.Data;
@@ -68,9 +69,10 @@ public sealed class PeachApiClient
 
         RestRequest request = new($"market/price/BTC{fiat}", Method.Get);
         AveragePrice? price = null;
+
         try {
             var response = await _client.ExecuteAsync<AveragePrice>(request);
-            if (!ValidateResponse(nameof(GetOfferAsync), response)) {
+            if (!IsSuccessfulResponse(nameof(GetOfferAsync), response)) {
                 return Maybe.Nothing<AveragePrice>();
             }
             price = response?.Data;
@@ -104,7 +106,7 @@ public sealed class PeachApiClient
             request.AddJsonBody(filter);
 
             response = await _client.ExecuteAsync(request);
-            if (!ValidateResponse(nameof(GetOfferAsync), response)) {
+            if (!IsSuccessfulResponse(nameof(GetOfferAsync), response)) {
                 return null;
             }
         }
@@ -159,9 +161,10 @@ public sealed class PeachApiClient
 
         RestRequest request = new($"offer/{id}", Method.Get);
         Offer? offer = null;
+
         try {
             var response = await _client.ExecuteAsync<Offer>(request);
-            if (!ValidateResponse(nameof(GetOfferAsync), response)) {
+            if (!IsSuccessfulResponse(nameof(GetOfferAsync), response)) {
                 return Maybe.Nothing<Offer>();
             }
             offer = response?.Data;
@@ -173,16 +176,57 @@ public sealed class PeachApiClient
         return offer.ToMaybe();
     }
 
-    bool ValidateResponse(string method, RestResponse response)
+    public Task<Either<ErrorInfo, TokenInfo>> RegisterAccount(KeySignatureInfo accountInfo)
+        => SubmitIdentity(accountInfo, register: true);
+
+    public Task<Either<ErrorInfo, TokenInfo>> AuthenticateAccount(KeySignatureInfo accountInfo)
+        => SubmitIdentity(accountInfo, register: false);
+
+    private async Task<Either<ErrorInfo, TokenInfo>> SubmitIdentity(KeySignatureInfo accountInfo, bool register)
+    {
+        RestRequest request = new(register ? "user/register" : "user/auth", Method.Post);
+        request.AddJsonBody(accountInfo);
+
+        Either<ErrorInfo, TokenInfo> result;
+        try {
+            var response = await _client.ExecuteAsync<TokenInfo>(request);
+            var error = ValidateResponse(nameof(SubmitIdentity), response);
+            result = error == null
+                ? Either.Right<ErrorInfo, TokenInfo>(response.Data!)
+                : Either.Left<ErrorInfo, TokenInfo>(error!);
+        }
+        catch (Exception ex) {
+            result = Either.Left<ErrorInfo, TokenInfo>(
+                new ErrorInfo(ErrorLevel.Critical, $"Unexpected error: {ex.Message}", ex));
+        }
+
+        return result;
+    }
+
+    private bool IsSuccessfulResponse(string method, RestResponse response)
+    {
+        var error = ValidateResponse(method, response);
+
+        return error == null
+            ? true : error.Level == ErrorLevel.Default
+                ? _logger.FailWith(error.Message) : _logger.PanicWith(error.Message);
+    }
+
+    private static ErrorInfo? ValidateResponse(string method, RestResponse response)
     {
         if (response == null) {
-            _logger.LogCritical("{Method} received a NULL response", method);
-            return false;
+            return new ErrorInfo(ErrorLevel.Critical, $"{method} received a NULL response");
         }
 
         if (!response.IsSuccessful) {
-            _logger.LogError("{Method} REST call failed with code {Code}", method, (int)response.StatusCode);
+            return new ErrorInfo(ErrorLevel.Default,
+                $"{method} REST call failed with code {(int)response.StatusCode}");
         }
-        return response.IsSuccessful;
+
+        if (response is RestResponse<object> genericResponse && genericResponse.Data == null) {
+            return new ErrorInfo(ErrorLevel.Critical, $"{method} received a NULL data object");
+        }
+
+        return null;
     }
 }
