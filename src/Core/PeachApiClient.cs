@@ -17,7 +17,7 @@ public sealed class PeachApiClient
     private readonly PeachApiClientSettings _settings;
     private readonly RestClient _client;
     private readonly JsonSerializerOptions _offerSerializerOptions;
-    private AuthInfo? _authInfo = null;
+    private AuthenticationInfo? _authInfo = null;
 
     public PeachApiClient(ILogger<PeachApiClient> logger,
         IOptions<PeachApiClientSettings> options)
@@ -206,6 +206,29 @@ public sealed class PeachApiClient
     public Task<Maybe<ErrorInfo>> AuthenticateAccount(KeySignatureInfo accountInfo)
         => SubmitIdentity(accountInfo, register: false);
 
+    public async Task<Maybe<User>> GetIdentity()
+    {
+        RestRequest request = new("user/me", Method.Get);
+        AuthenticateRequest(request);
+        User? user = null;
+
+        try
+        {
+            var response = await _client.ExecuteAsync<User>(request);
+            if (!IsSuccessfulResponse(nameof(GetOfferAsync), response))
+            {
+                return Maybe.Nothing<User>();
+            }
+            user = response?.Data;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogCritical(ex, "Failed to retrieve logged-in user data");
+        }
+
+        return user.ToMaybe();
+    }
+
     private async Task<Maybe<ErrorInfo>> SubmitIdentity(KeySignatureInfo accountInfo, bool register)
     {
         RestRequest request = new(register ? "user/register" : "user/auth", Method.Post);
@@ -214,7 +237,7 @@ public sealed class PeachApiClient
         ErrorInfo? error = null;
         try
         {
-            var response = await _client.ExecuteAsync<AuthInfo>(request);
+            var response = await _client.ExecuteAsync<AuthenticationInfo>(request);
             error = ValidateResponse(nameof(SubmitIdentity), response);
             _authInfo = response.Data!;
             _logger.LogDebug($"Token '{_authInfo.AccessToken.Substring(9)}..' successfully registered within the current client instance");
@@ -255,5 +278,13 @@ public sealed class PeachApiClient
         }
 
         return null;
+    }
+
+    private void AuthenticateRequest(RestRequest request)
+    {
+        if (_authInfo == null) throw new InvalidOperationException(
+            "Cannot authenticate request: authentication info is not initialized.");
+
+        request.AddHeader("Authorization", $"Bearer {_authInfo.AccessToken}");
     }
 }
