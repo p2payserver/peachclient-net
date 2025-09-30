@@ -229,6 +229,32 @@ public sealed class PeachApiClient
         return user.ToMaybe();
     }
 
+    public async Task<bool> UpdateUserAccount(UpdateUserRequest updateData)
+    {
+        DisallowNull(nameof(updateData), updateData);
+
+        RestRequest request = new("user", Method.Post);
+        AuthenticateRequest(request);
+        request.AddJsonBody(updateData);
+
+        try
+        {
+            var response = await _client.ExecuteAsync<OperationResult>(request);
+            if (!IsSuccessfulResponse(nameof(GetOfferAsync), response))
+            {
+                return false;
+            }
+
+            return response.Data!.Success;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogCritical(ex, "Failed to update user account");
+        }
+
+        return false;
+    }
+
     private async Task<Maybe<ErrorInfo>> SubmitIdentity(KeySignatureInfo accountInfo, bool register)
     {
         RestRequest request = new(register ? "user/register" : "user/auth", Method.Post);
