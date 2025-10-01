@@ -1,4 +1,4 @@
-using System.Text.Json;
+﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -198,6 +198,28 @@ public sealed class PeachApiClient
         }
 
         return offer.ToMaybe();
+    }
+
+    public async Task<Maybe<Offer>> CreateOffer(InsertOfferRequest insertData)
+    {
+        DisallowNull(nameof(insertData), insertData);
+
+        RestRequest request = new("offer", Method.Post);
+        AuthenticateRequest(request);
+        request.AddJsonBody(insertData);
+
+        Offer? newOffer = null;
+        try {
+            var response = await _client.ExecuteAsync<Offer>(request);
+            if (IsSuccessfulResponse(nameof(GetOfferAsync), response)) {
+                newOffer = response.Data;
+            }
+        }
+        catch (Exception ex) {
+            _logger.LogCritical(ex, "Failed to update user account");
+        }
+
+        return newOffer.ToMaybe();
     }
 
     public Task<Maybe<ErrorInfo>> RegisterAccount(KeySignatureInfo accountInfo)

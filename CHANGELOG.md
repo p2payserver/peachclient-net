@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Refactored registration and authentication methods.
 - Implemented `GetIdentity` method.
 - Implemented `UpdateUserAccount` method.
+- Implemented `CreateOffer` method.
 
 ## [0.1.6-preview] - 2025-09-26
 
