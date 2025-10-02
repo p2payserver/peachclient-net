@@ -200,7 +200,7 @@ public sealed class PeachApiClient
         return offer.ToMaybe();
     }
 
-    public async Task<Maybe<Offer>> CreateOffer(InsertOfferRequest insertData)
+    public async Task<Maybe<Offer>> CreateOfferAsync(InsertOfferRequest insertData)
     {
         DisallowNull(nameof(insertData), insertData);
 
@@ -222,11 +222,11 @@ public sealed class PeachApiClient
         return newOffer.ToMaybe();
     }
 
-    public Task<Maybe<ErrorInfo>> RegisterAccount(KeySignatureInfo accountInfo)
-        => SubmitIdentity(accountInfo, register: true);
+    public Task<Maybe<ErrorInfo>> RegisterAccountAsync(KeySignatureInfo accountInfo)
+        => SubmitIdentityAsync(accountInfo, register: true);
 
-    public Task<Maybe<ErrorInfo>> AuthenticateAccount(KeySignatureInfo accountInfo)
-        => SubmitIdentity(accountInfo, register: false);
+    public Task<Maybe<ErrorInfo>> AuthenticateAccountAsync(KeySignatureInfo accountInfo)
+        => SubmitIdentityAsync(accountInfo, register: false);
 
     public async Task<Maybe<User>> GetIdentity()
     {
@@ -277,7 +277,7 @@ public sealed class PeachApiClient
         return false;
     }
 
-    private async Task<Maybe<ErrorInfo>> SubmitIdentity(KeySignatureInfo accountInfo, bool register)
+    private async Task<Maybe<ErrorInfo>> SubmitIdentityAsync(KeySignatureInfo accountInfo, bool register)
     {
         RestRequest request = new(register ? "user/register" : "user/auth", Method.Post);
         request.AddJsonBody(accountInfo);
@@ -286,7 +286,7 @@ public sealed class PeachApiClient
         try
         {
             var response = await _client.ExecuteAsync<AuthenticationInfo>(request);
-            error = ValidateResponse(nameof(SubmitIdentity), response);
+            error = ValidateResponse(nameof(SubmitIdentityAsync), response);
             _authInfo = response.Data!;
             _logger.LogDebug($"Token '{_authInfo.AccessToken.Substring(9)}..' successfully registered within the current client instance");
         }
