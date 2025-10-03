@@ -288,7 +288,14 @@ public sealed class PeachApiClient
             var response = await _client.ExecuteAsync<AuthenticationInfo>(request);
             error = ValidateResponse(nameof(SubmitIdentityAsync), response);
             _authInfo = response.Data!;
-            _logger.LogDebug($"Token '{_authInfo.AccessToken.Substring(9)}..' successfully registered within the current client instance");
+            // Check against an empty access token
+            if (_authInfo.AccessToken.IsEmpty()) {
+                _authInfo = null;
+                error = new ErrorInfo(ErrorLevel.Critical, "Error: response is empty");
+            }
+            else {
+                _logger.LogDebug($"Token '{_authInfo.AccessToken.Substring(9)}...' successfully registered within the current client instance");
+            }
         }
         catch (Exception ex)
         {
