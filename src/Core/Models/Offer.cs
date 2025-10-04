@@ -11,7 +11,7 @@ public enum OfferType
 
 public record Offer(
     string Id,
-    [property: JsonConverter(typeof(JsonStringEnumConverter))]  OfferType Type,
+    [property: JsonConverter(typeof(JsonStringEnumConverter))] OfferType Type,
     User User,
     [property: JsonConverter(typeof(DecimalArrayFlexibleConverter))] decimal[] Amount,
     Dictionary<string, List<string>> MeansOfPayment,

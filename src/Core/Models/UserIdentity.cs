@@ -6,7 +6,7 @@ public record KeySignatureInfo(
     string Signature
 );
 
-public record TokenInfo(
+public record AuthenticationInfo(
     long Expiry,
     string AccessToken
 );

@@ -8,12 +8,10 @@ namespace PeachApiClientTests;
 
 public class GetOfferTests(ITestOutputHelper output)
 {
-    const int DEFAULT_DELAY_MS = 500;
-
-    [Fact, Delay(DEFAULT_DELAY_MS)]
+    [Fact, Delay()]
     public async Task Get_an_ask_offer() => await GetOfferAndAssertAsync(OfferType.Ask);
 
-    [Fact, Delay(DEFAULT_DELAY_MS)]
+    [Fact, Delay()]
     public async Task Get_a_bid_offer() => await GetOfferAndAssertAsync(OfferType.Bid);
 
     private async Task GetOfferAndAssertAsync(OfferType type)
