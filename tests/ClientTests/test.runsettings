@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RunSettings>
-    <EnvironmentVariables>
-        <UseRegTestUri>true</UseRegTestUri>
-        <DelayForProdApiMs>1000</DelayForProdApiMs>
-        <PublicKey></PublicKey>
-        <Message></Message>
-        <Signature></Signature>
-    </EnvironmentVariables>
+  <EnvironmentVariables>
+    <UseRegTestUri>true</UseRegTestUri>
+    <DelayForProdApiMs>1000</DelayForProdApiMs>
+    <PublicKey></PublicKey>
+    <PrivateKey></PrivateKey>
+    <Message></Message>
+    <Signature></Signature>
+  </EnvironmentVariables>
 </RunSettings>
