@@ -3,9 +3,9 @@ using PeachClient.Models;
 using SharpX;
 using Xunit.Abstractions;
 
-namespace PeachApiClientTests;
+namespace PeachApiClient_Tests;
 
-public class SearchOffersTests(ITestOutputHelper output)
+public class SearchOffers(ITestOutputHelper output)
 {
     const int DEFAULT_DELAY_MS = 1000;
 

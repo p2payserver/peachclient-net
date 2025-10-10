@@ -3,7 +3,8 @@ namespace PeachClient.Models;
 public record KeySignatureInfo(
     string PublicKey,
     string Message,
-    string Signature
+    string Signature,
+    string UniqueId
 );
 
 public record AuthenticationInfo(

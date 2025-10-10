@@ -4,9 +4,9 @@ using SharpX;
 using SharpX.Extensions;
 using Xunit.Abstractions;
 
-namespace PeachApiClientTests;
+namespace PeachApiClient_Tests;
 
-public class _MoreTests(ITestOutputHelper output)
+public class _More(ITestOutputHelper output)
 {
     [Fact]
     public async Task Get_BTC_unit_price_in_EUR()

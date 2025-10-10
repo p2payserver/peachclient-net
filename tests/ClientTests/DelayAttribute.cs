@@ -3,9 +3,11 @@ using Xunit.Sdk;
 
 public class DelayAttribute : BeforeAfterTestAttribute
 {
+    private readonly TestsConfig _config = new();
+
     public override void After(MethodInfo methodUnderTest)
     {
-        if (TestsConfig.UseRegTestUri) return;
+        if (_config.UseRegTestUri) return;
 
         Thread.Sleep(TestsConfig.DelayForProdApiMs);
     }

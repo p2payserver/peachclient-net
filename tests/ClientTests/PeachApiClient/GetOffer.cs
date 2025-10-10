@@ -4,9 +4,9 @@ using SharpX;
 using SharpX.Extensions;
 using Xunit.Abstractions;
 
-namespace PeachApiClientTests;
+namespace PeachApiClient_Tests;
 
-public class GetOfferTests(ITestOutputHelper output)
+public class GetOffer(ITestOutputHelper output)
 {
     [Fact, Delay()]
     public async Task Get_an_ask_offer() => await GetOfferAndAssertAsync(OfferType.Ask);
