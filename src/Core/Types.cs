@@ -12,3 +12,9 @@ public record ErrorInfo(
     string Message,
     Exception? Exception = null
 );
+
+public record SignatureInfo(
+    string Publickey,
+    string Message,
+    string Value
+);
