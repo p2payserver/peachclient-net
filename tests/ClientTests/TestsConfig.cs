@@ -1,12 +1,13 @@
-public static class TestsConfig
+public class TestsConfig
 {
-    public static bool UseRegTestUri =>
+    public bool UseRegTestUri =>
         Convert.ToBoolean(Environment.GetEnvironmentVariable("UseRegTestUri"));
 
     public static TimeSpan DelayForProdApiMs =>
         TimeSpan.FromDays(Convert.ToDouble(Environment.GetEnvironmentVariable("DelayForProdApiMs")));
 
-    public static string PublicKey => Environment.GetEnvironmentVariable("PublicKey")!;
-    public static string Message => Environment.GetEnvironmentVariable("Message")!;
-    public static string Signature => Environment.GetEnvironmentVariable("Signature")!;
+    public string PublicKey => Environment.GetEnvironmentVariable("PublicKey")!;
+    public string Message => Environment.GetEnvironmentVariable("Message")!;
+    public string Signature => Environment.GetEnvironmentVariable("Signature")!;
+    public string PrivateKey => Environment.GetEnvironmentVariable("PrivateKey")!;
 }
