@@ -282,27 +282,26 @@ public sealed class PeachApiClient
         RestRequest request = new(register ? "user/register" : "user/auth", Method.Post);
         request.AddJsonBody(accountInfo);
 
-        ErrorInfo? error = null;
         try
         {
             var response = await _client.ExecuteAsync<AuthenticationInfo>(request);
-            error = ValidateResponse(nameof(SubmitIdentityAsync), response);
+            var error = ValidateResponse(nameof(SubmitIdentityAsync), response);
+            if (error != null) return error.ToJust();
             _authInfo = response.Data!;
             // Check against an empty access token
             if (_authInfo.AccessToken.IsEmpty()) {
                 _authInfo = null;
-                error = new ErrorInfo(ErrorLevel.Critical, "Error: response is empty");
+                return new ErrorInfo(ErrorLevel.Critical, "Error: response is empty").ToJust();
             }
             else {
                 _logger.LogDebug($"Token '{_authInfo.AccessToken.Substring(9)}...' successfully registered within the current client instance");
+                return Maybe.Nothing<ErrorInfo>();
             }
         }
         catch (Exception ex)
         {
-            error = new ErrorInfo(ErrorLevel.Critical, $"Unexpected error: {ex.Message}", ex);
+            return new ErrorInfo(ErrorLevel.Critical, $"Unexpected error: {ex.Message}", ex).ToJust();
         }
-
-        return error.ToMaybe();
     }
 
     private bool IsSuccessfulResponse(string method, RestResponse response)
