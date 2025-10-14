@@ -14,7 +14,7 @@ public sealed class MessageSigner(ILogger<MessageSigner> logger)
 
     public Maybe<SignatureInfo> CreateSignature(string privateKeyHex)
     {
-        var message = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds().ToString();
+        var message = $"Peach Registration {new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds()}";
 
         try {
             var master = ExtKey.Parse(privateKeyHex, Network.Main);
