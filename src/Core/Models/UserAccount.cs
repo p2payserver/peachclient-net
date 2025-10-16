@@ -4,7 +4,7 @@ public record KeySignatureInfo(
     string PublicKey,
     string Message,
     string Signature,
-    string UniqueId
+    string? UniqueId = null
 );
 
 public record AuthenticationInfo(

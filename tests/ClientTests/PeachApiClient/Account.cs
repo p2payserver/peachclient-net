@@ -1,3 +1,4 @@
+using System.Xml;
 using PeachClient;
 using PeachClient.Models;
 using SharpX;
@@ -10,7 +11,7 @@ public class Account(ITestOutputHelper output)
 {
     private readonly TestsConfig _config = new();
 
-    [Fact]//(Skip = "Test must be manually activated")]
+    [Fact(Skip = "Test must be manually activated")]
     public async Task Register_account()
     {
         if (_config.UseRegTestUri) {
@@ -42,5 +43,28 @@ public class Account(ITestOutputHelper output)
         }
 
         output.WriteLine("Account registred");
+    }
+
+
+    [Fact(Skip = "Test must be manually activated")]
+    public async Task Authenticate_account()
+    {
+        if (_config.UseRegTestUri) {
+            Assert.Fail("Register_account test is intended for Peach production environment");
+        }
+        if (_config.PublicKey.IsEmpty() || _config.Message.IsEmpty() || _config.Signature.IsEmpty()) {
+            Assert.Fail("Authentication data must be configured in test.runsettings file");
+        }
+
+        PeachApiClient client = Factory.CreatePeachClient();
+
+        var keyInfo = new KeySignatureInfo(_config.PublicKey, _config.Message,
+            _config.Signature);
+        var regResult = await client.AuthenticateAccountAsync(keyInfo);
+        if (regResult.MatchJust(out var error)) {
+            Assert.Fail(error!.Message);
+        }
+
+        output.WriteLine("Account authenticated");
     }
 }
