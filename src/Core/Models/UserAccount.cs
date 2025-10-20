@@ -1,13 +1,13 @@
 namespace PeachClient.Models;
 
-public record KeySignatureInfo(
+internal record KeySignatureInfo(
     string PublicKey,
     string Message,
     string Signature,
     string? UniqueId = null
 );
 
-public record AuthenticationInfo(
+internal record AuthenticationInfo(
     long Expiry,
     string AccessToken
 );

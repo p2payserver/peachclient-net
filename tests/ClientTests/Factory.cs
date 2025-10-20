@@ -15,6 +15,4 @@ public static class Factory
 
         return new(NullLogger<PeachApiClient>.Instance, Options.Create(settings));
     }
-
-    public static MessageSigner CreateSigner() => new(NullLogger<MessageSigner>.Instance);
 }

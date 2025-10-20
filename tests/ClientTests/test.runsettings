@@ -4,10 +4,7 @@
     <EnvironmentVariables>
       <UseRegTestUri>false</UseRegTestUri>
       <DelayForProdApiMs>1000</DelayForProdApiMs>
-      <PublicKey></PublicKey>
       <PrivateKey></PrivateKey>
-      <Message></Message>
-      <Signature></Signature>
     </EnvironmentVariables>
   </RunConfiguration>
 </RunSettings>

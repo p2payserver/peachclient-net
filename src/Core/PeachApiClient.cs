@@ -18,6 +18,7 @@ public sealed class PeachApiClient
     private readonly RestClient _client;
     private readonly JsonSerializerOptions _offerSerializerOptions;
     private AuthenticationInfo? _authInfo = null;
+    private MessageSigner _signer;
 
     public PeachApiClient(ILogger<PeachApiClient> logger,
         IOptions<PeachApiClientSettings> options)
@@ -42,6 +43,8 @@ public sealed class PeachApiClient
             PropertyNameCaseInsensitive = true,
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
         };
+
+        _signer = new(logger);
     }
 
     public async Task<Maybe<SystemStatus>> GetSystemStatusAsync()
@@ -222,11 +225,11 @@ public sealed class PeachApiClient
         return newOffer.ToMaybe();
     }
 
-    public Task<Maybe<ErrorInfo>> RegisterAccountAsync(KeySignatureInfo accountInfo)
-        => SubmitAccountAsync(accountInfo, register: true);
+    public Task<Maybe<ErrorInfo>> RegisterAccountAsync(string privateKey)
+        => SubmitAccountAsync(privateKey, register: true);
 
-    public Task<Maybe<ErrorInfo>> AuthenticateAccountAsync(KeySignatureInfo accountInfo)
-        => SubmitAccountAsync(accountInfo, register: false);
+    public Task<Maybe<ErrorInfo>> AuthenticateAccountAsync(string privateKey)
+        => SubmitAccountAsync(privateKey, register: false);
 
     public async Task<Maybe<User>> GetIdentity()
     {
@@ -277,11 +280,19 @@ public sealed class PeachApiClient
         return false;
     }
 
-    private async Task<Maybe<ErrorInfo>> SubmitAccountAsync(KeySignatureInfo accountInfo, bool register)
+    private async Task<Maybe<ErrorInfo>> SubmitAccountAsync(string privateKey, bool register)
     {
-        RestRequest request = new(register ? "user/register" : "user/auth", Method.Post);
-        request.AddJsonBody(accountInfo);
+        if (!_signer.CreateSignature(privateKey).MatchJust(out var signatureInfo)) {
+            return new ErrorInfo(ErrorLevel.Default, "Error: signature failed").ToJust();
+        }
 
+        RestRequest request = new(register ? "user/register" : "user/auth", Method.Post);
+
+        string? uniqueId = register
+            ? new Guid().ToString().Replace("-", "") : null;
+        request.AddJsonBody(new KeySignatureInfo(
+            signatureInfo!.Publickey, signatureInfo.Message, signatureInfo.Value, uniqueId));
+        
         try
         {
             var response = await _client.ExecuteAsync<AuthenticationInfo>(request);
@@ -291,7 +302,7 @@ public sealed class PeachApiClient
             // Check against an empty access token
             if (_authInfo.AccessToken.IsEmpty()) {
                 _authInfo = null;
-                return new ErrorInfo(ErrorLevel.Critical, "Error: response is empty").ToJust();
+                return new ErrorInfo(ErrorLevel.Default, "Error: response is empty").ToJust();
             }
             else {
                 _logger.LogDebug($"Token '{_authInfo.AccessToken.Substring(9)}...' successfully registered within the current client instance");

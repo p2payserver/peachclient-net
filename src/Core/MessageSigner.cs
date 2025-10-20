@@ -8,10 +8,8 @@ using SharpX;
 
 namespace PeachClient;
 
-public sealed class MessageSigner(ILogger<MessageSigner> logger)
+internal sealed class MessageSigner(ILogger logger)
 {
-    private readonly ILogger _logger = logger;
-
     public Maybe<SignatureInfo> CreateSignature(string privateKeyHex)
     {
         var message = $"Peach Registration {new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds()}";
@@ -37,7 +35,7 @@ public sealed class MessageSigner(ILogger<MessageSigner> logger)
             return new SignatureInfo(pubKey.ToHex(), message, BitConverter.ToString(compactSig).Replace("-", "").ToLower()).ToJust();
         }
         catch (Exception ex) {
-            _logger.LogCritical(ex, "Failed to sign message");
+            logger.LogCritical(ex, "Failed to sign message");
             
             return Maybe.Nothing<SignatureInfo>();
         }
