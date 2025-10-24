@@ -52,17 +52,14 @@ public sealed class PeachApiClient
         RestRequest request = new("system/status", Method.Get);
         SystemStatus? status = null;
 
-        try
-        {
+        try {
             var response = await _client.ExecuteAsync<SystemStatus>(request);
-            if (!IsSuccessfulResponse(nameof(GetOfferAsync), response))
-            {
+            if (!IsSuccessfulResponse(nameof(GetOfferAsync), response)) {
                 return Maybe.Nothing<SystemStatus>();
             }
             status = response?.Data;
         }
-        catch (Exception ex)
-        {
+        catch (Exception ex) {
             _logger.LogCritical(ex, "Failed to retrieve Peach system status");
         }
 
@@ -77,62 +74,51 @@ public sealed class PeachApiClient
         RestRequest request = new($"market/price/BTC{fiat}", Method.Get);
         AveragePrice? price = null;
 
-        try
-        {
+        try {
             var response = await _client.ExecuteAsync<AveragePrice>(request);
-            if (!IsSuccessfulResponse(nameof(GetOfferAsync), response))
-            {
+            if (!IsSuccessfulResponse(nameof(GetOfferAsync), response)) {
                 return Maybe.Nothing<AveragePrice>();
             }
             price = response?.Data;
         }
-        catch (Exception ex)
-        {
+        catch (Exception ex) {
             _logger.LogCritical(ex, "Failed to retrieve market price");
         }
 
         return price!.ToMaybe();
     }
 
-    public async Task<OfferResponse?> SearchOffersAsync(OfferFilter filter,
+    public async Task<OfferResponse?> SearchOffersAsync(OfferTypeFilter offerType,
         OfferPagination? pagination = null, OfferSortBy? sort = null, bool skipPgpFields = false)
     {
-        DisallowNull(nameof(filter), filter);
-
-        if (skipPgpFields)
-        {
+        if (skipPgpFields) {
             _offerSerializerOptions.Converters.Add(new UserSkipPgpFieldsConverter());
         }
 
         RestResponse response;
-        try
-        {
-            var request = new RestRequest("offer/search", Method.Post);
-            if (pagination != null)
-            {
+        try {
+            var searchPath = offerType == OfferTypeFilter.Sell ? "offer/search/sell" : "offer/search/buy";
+            var request = new RestRequest(searchPath, Method.Get);
+
+            if (pagination != null) {
                 request.AddQueryParameter("page", pagination.PageNumber.ToString(), encode: false);
                 request.AddQueryParameter("size", pagination.PageSize.ToString(), encode: false);
             }
-            if (sort != null)
-            {
+            if (sort != null) {
                 request.AddQueryParameter("sortBy", sort.ToString().ToLowerFirst());
             }
-            request.AddJsonBody(filter);
 
             response = await _client.ExecuteAsync(request);
-            if (!IsSuccessfulResponse(nameof(GetOfferAsync), response))
-            {
+            if (!IsSuccessfulResponse(nameof(SearchOffersAsync), response)) {
                 return null;
             }
         }
-        catch (Exception ex)
-        {
+        catch (Exception ex) {
             _logger.LogCritical(ex, "Failed to search offers");
             return null;
         }
 
-        if (!response.IsSuccessful || response.Content.IsEmpty())
-        {
+        if (!response.IsSuccessful || response.Content.IsEmpty()) {
             return null;
         }
 
@@ -141,34 +127,27 @@ public sealed class PeachApiClient
         var offers = new List<Offer>();
 
         int total = 0, remaining = 0;
-        if (jsonDoc.RootElement.TryGetProperty("total", out var totalElement))
-        {
+        if (jsonDoc.RootElement.TryGetProperty("total", out var totalElement)) {
             total = totalElement.GetInt32();
         }
-        else
-        {
+        else {
             return BadSchema("total");
         }
-        if (jsonDoc.RootElement.TryGetProperty("remaining", out var remainingElement))
-        {
+        if (jsonDoc.RootElement.TryGetProperty("remaining", out var remainingElement)) {
             remaining = remainingElement.GetInt32();
         }
-        else
-        {
+        else {
             return BadSchema("remaining");
         }
 
-        if (jsonDoc.RootElement.TryGetProperty("offers", out var offersElement))
-        {
-            foreach (var offerElement in offersElement.EnumerateArray())
-            {
+        if (jsonDoc.RootElement.TryGetProperty("offers", out var offersElement)) {
+            foreach (var offerElement in offersElement.EnumerateArray()) {
                 var offer = offerElement.Deserialize<Offer>(_offerSerializerOptions);
 
                 offers.Add(offer);
             }
         }
-        else
-        {
+        else {
             return BadSchema("offers");
         }
 
@@ -178,25 +157,22 @@ public sealed class PeachApiClient
             $"Unexpected response schema for offer search.\nCannot find '{property}' property", null);
     }
 
-    public async Task<Maybe<Offer>> GetOfferAsync(string id)
+    public async Task<Maybe<Offer>> GetOfferAsync(int id)
     {
-        DisallowNull(nameof(id), id);
-        if (id.IsNumber()) throw new ArgumentException($"Invalid {nameof(id)} parameter format.", nameof(id));
+        //DisallowNull(nameof(id), id);
+        //if (id.IsNumber()) throw new ArgumentException($"Invalid {nameof(id)} parameter format.", nameof(id));
 
         RestRequest request = new($"offer/{id}", Method.Get);
         Offer? offer = null;
 
-        try
-        {
+        try {
             var response = await _client.ExecuteAsync<Offer>(request);
-            if (!IsSuccessfulResponse(nameof(GetOfferAsync), response))
-            {
+            if (!IsSuccessfulResponse(nameof(GetOfferAsync), response)) {
                 return Maybe.Nothing<Offer>();
             }
             offer = response?.Data;
         }
-        catch (Exception ex)
-        {
+        catch (Exception ex) {
             _logger.LogCritical(ex, "Failed to retrieve market price");
         }
 
@@ -237,17 +213,14 @@ public sealed class PeachApiClient
         AuthenticateRequest(request);
         User? user = null;
 
-        try
-        {
+        try {
             var response = await _client.ExecuteAsync<User>(request);
-            if (!IsSuccessfulResponse(nameof(GetOfferAsync), response))
-            {
+            if (!IsSuccessfulResponse(nameof(GetOfferAsync), response)) {
                 return Maybe.Nothing<User>();
             }
             user = response?.Data;
         }
-        catch (Exception ex)
-        {
+        catch (Exception ex) {
             _logger.LogCritical(ex, "Failed to retrieve logged-in user data");
         }
 
@@ -262,18 +235,15 @@ public sealed class PeachApiClient
         AuthenticateRequest(request);
         request.AddJsonBody(updateData);
 
-        try
-        {
+        try {
             var response = await _client.ExecuteAsync<OperationResult>(request);
-            if (!IsSuccessfulResponse(nameof(GetOfferAsync), response))
-            {
+            if (!IsSuccessfulResponse(nameof(GetOfferAsync), response)) {
                 return false;
             }
 
             return response.Data!.Success;
         }
-        catch (Exception ex)
-        {
+        catch (Exception ex) {
             _logger.LogCritical(ex, "Failed to update user account");
         }
 
@@ -292,9 +262,8 @@ public sealed class PeachApiClient
             ? new Guid().ToString().Replace("-", "") : null;
         request.AddJsonBody(new KeySignatureInfo(
             signatureInfo!.Publickey, signatureInfo.Message, signatureInfo.Value, uniqueId));
-        
-        try
-        {
+
+        try {
             var response = await _client.ExecuteAsync<AuthenticationInfo>(request);
             var error = ValidateResponse(nameof(SubmitAccountAsync), response);
             if (error != null) return error.ToJust();
@@ -309,8 +278,7 @@ public sealed class PeachApiClient
                 return Maybe.Nothing<ErrorInfo>();
             }
         }
-        catch (Exception ex)
-        {
+        catch (Exception ex) {
             return new ErrorInfo(ErrorLevel.Critical, $"Unexpected error: {ex.Message}", ex).ToJust();
         }
     }
@@ -326,19 +294,16 @@ public sealed class PeachApiClient
 
     private static ErrorInfo? ValidateResponse(string method, RestResponse response)
     {
-        if (response == null)
-        {
+        if (response == null) {
             return new ErrorInfo(ErrorLevel.Critical, $"{method} received a NULL response");
         }
 
-        if (!response.IsSuccessful)
-        {
+        if (!response.IsSuccessful) {
             return new ErrorInfo(ErrorLevel.Default,
                 $"{method} REST call failed with code {(int)response.StatusCode}");
         }
 
-        if (response is RestResponse<object> genericResponse && genericResponse.Data == null)
-        {
+        if (response is RestResponse<object> genericResponse && genericResponse.Data == null) {
             return new ErrorInfo(ErrorLevel.Critical, $"{method} received a NULL data object");
         }
 

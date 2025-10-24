@@ -19,7 +19,7 @@ public class GetOffer(ITestOutputHelper output)
         PeachApiClient client = Factory.CreatePeachClient();
 
         var offerId = await PickOfferIdAsync(client,
-            type == OfferType.Ask ? OfferTypeFilter.Ask : OfferTypeFilter.Bid);
+            type == OfferType.Ask ? OfferTypeFilter.Sell : OfferTypeFilter.Buy);
 
         var result = await client.GetOfferAsync(offerId);
 
@@ -36,16 +36,9 @@ public class GetOffer(ITestOutputHelper output)
         }
     }
 
-    private async Task<string> PickOfferIdAsync(PeachApiClient client, OfferTypeFilter type)
+    private async Task<int> PickOfferIdAsync(PeachApiClient client, OfferTypeFilter type)
     {
-        var response = await client.SearchOffersAsync(new OfferFilter
-        {
-            Type = type,
-            Amount = [100_000, 1_000_000],
-            MeansOfPayment = new() { ["EUR"] = ["sepa"] },
-            MaxPremium = 12,
-            MinReputation = 0.5
-        });
+        var response = await client.SearchOffersAsync(type);
 
         if (response == null || response.Total == 0) {
             Assert.Fail($"Unable to get any offer of type {type}");

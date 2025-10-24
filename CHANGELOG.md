@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Implemented `GetIdentity` method.
 - Implemented `UpdateUserAccount` method.
 - Implemented `CreateOffer` method.
+- Refactored `SearchOffersAsync` for API breaking changes.
 
 ## [0.1.6-preview] - 2025-09-26
 

@@ -4,7 +4,7 @@ public class TestsConfig
         Convert.ToBoolean(Environment.GetEnvironmentVariable("UseRegTestUri"));
 
     public static TimeSpan DelayForProdApiMs =>
-        TimeSpan.FromDays(Convert.ToDouble(Environment.GetEnvironmentVariable("DelayForProdApiMs")));
+        TimeSpan.FromMicroseconds(Convert.ToDouble(Environment.GetEnvironmentVariable("DelayForProdApiMs")));
 
     public string PublicKey => Environment.GetEnvironmentVariable("PublicKey")!;
     public string Message => Environment.GetEnvironmentVariable("Message")!;

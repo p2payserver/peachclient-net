@@ -36,7 +36,7 @@ Uses public key cryptography with BIP32 key derivation:
 ### Public Endpoints (No Auth)
 - `GetSystemStatusAsync()` - System health check
 - `GetBtcMarketPriceAsync(fiat)` - BTC price in specified fiat
-- `SearchOffersAsync(filter, pagination, sort)` - Search buy/sell offers
+- `SearchOffersAsync(offerType, pagination, sort)` - Search buy/sell offers (GET request to `/offer/search/sell` or `/offer/search/buy`)
 - `GetOfferAsync(id)` - Get specific offer details
 
 ### Authenticated Endpoints
@@ -62,16 +62,20 @@ Offer(Id, Type, User, Amount[], MeansOfPayment, Online, PublishingDate, Premium,
 User { Id, CreationDate, Trades, Rating, Medals[], Disputes, PgpPublicKey, ... }
 ```
 
-### OfferFilter
+### OfferTypeFilter
 ```csharp
-OfferFilter { Type, Amount, MeansOfPayment, MaxPremium, MinReputation }
+enum OfferTypeFilter { Sell, Buy }
 ```
+**Note**: `OfferFilter` class has been deprecated after Peach API breaking change. Search is now simplified to GET requests with type-based routing.
 
 ## Special Implementation Notes
 
 ### Offer Search
-- Large JSON → custom `JsonDocument` parsing  
-- `skipPgpFields` option to trim payload  
+- **Breaking change**: Changed from POST with `OfferFilter` body to simple GET with type-based routing
+- Routes: `/offer/search/sell` (for Sell) or `/offer/search/buy` (for Buy)
+- Still supports pagination and sorting via query parameters
+- Large JSON → custom `JsonDocument` parsing
+- `skipPgpFields` option to trim payload
 - Implemented in `SearchOffersAsync()` (`PeachApiClient.cs:97-179`)
 
 ### Error Handling
@@ -91,3 +95,8 @@ Test structure in `tests/ClientTests/`:
 - `GetOffer.cs` - Single offer retrieval
 - `Account.cs` - Registration/authentication
 - `_More.cs` - Additional test scenarios
+
+# Implementation Policies
+- Keep the code as clean and simple as possible, while adhering to the existing style
+- Do not remove features arbitrarily unless explicitly requested
+- Do not create unit tests unless explicitly requested

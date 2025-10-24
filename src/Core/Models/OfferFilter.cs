@@ -5,11 +5,13 @@ namespace PeachClient.Models;
 
 public enum OfferTypeFilter
 {
-    All = 0,
-    Ask,
-    Bid
+    Sell = 0,
+    Buy
 }
 
+// DEPRECATED: OfferFilter no longer used after Peach API breaking change
+// Offer search is now a simple GET request with only type filter
+/*
 public record class OfferFilter
 {
     [property: JsonConverter(typeof(OfferTypeFilterConverter))]
@@ -19,6 +21,7 @@ public record class OfferFilter
     public decimal? MaxPremium { get; set; }
     public double? MinReputation { get; set; }
 }
+*/
 
 public record class OfferPagination(int PageNumber, int PageSize);
 
