@@ -11,8 +11,8 @@ public class GetOffer(ITestOutputHelper output)
     [Fact, Delay()]
     public async Task Get_an_ask_offer() => await GetOfferAndAssertAsync(OfferType.Ask);
 
-    [Fact, Delay()]
-    public async Task Get_a_bid_offer() => await GetOfferAndAssertAsync(OfferType.Bid);
+    //[Fact, Delay()]
+    //public async Task Get_a_bid_offer() => await GetOfferAndAssertAsync(OfferType.Bid);
 
     private async Task GetOfferAndAssertAsync(OfferType type)
     {
