@@ -50,7 +50,7 @@ public class SearchOffers(ITestOutputHelper output)
     assert: offers =>
     {
         Assert.Equal(2, offers.Count);
-        Assert.True(offers.ElementAt(0).Amount[0] > offers.ElementAt(1).Amount[0]);
+        Assert.True(offers.ElementAt(0).Amount > offers.ElementAt(1).Amount);
     },
     failOnEmpty: true);
 

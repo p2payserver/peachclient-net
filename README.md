@@ -13,7 +13,7 @@ Based on their official [API documentation](https://docs.peachbitcoin.com/#intro
 ## Install via NuGet
 
 ```
-dotnet add package PeachClient --version 0.2.1-preview.223
+dotnet add package PeachClient --version 0.2.1-preview.228
 ```
 
 ## Quick Start
