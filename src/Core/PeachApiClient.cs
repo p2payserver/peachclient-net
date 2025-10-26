@@ -157,7 +157,7 @@ public sealed class PeachApiClient
             $"Unexpected response schema for offer search.\nCannot find '{property}' property", null);
     }
 
-    public async Task<Maybe<Offer>> GetOfferAsync(int id)
+    public async Task<Maybe<Offer>> GetOfferAsync(long id)
     {
         //DisallowNull(nameof(id), id);
         //if (id.IsNumber()) throw new ArgumentException($"Invalid {nameof(id)} parameter format.", nameof(id));

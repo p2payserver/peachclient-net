@@ -36,7 +36,7 @@ public class GetOffer(ITestOutputHelper output)
         }
     }
 
-    private async Task<int> PickOfferIdAsync(PeachApiClient client, OfferTypeFilter type)
+    private async Task<long> PickOfferIdAsync(PeachApiClient client, OfferTypeFilter type)
     {
         var response = await client.SearchOffersAsync(type);
 

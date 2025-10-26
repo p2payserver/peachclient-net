@@ -10,7 +10,7 @@ public enum OfferType
 }
 
 public record Offer(
-    int Id,
+     [property: JsonConverter(typeof(FlexibleLongConverter))] long Id,
     [property: JsonConverter(typeof(JsonStringEnumConverter))] OfferType Type,
     User User,
     [property: JsonConverter(typeof(DecimalArrayFlexibleConverter))] decimal[] Amount,
